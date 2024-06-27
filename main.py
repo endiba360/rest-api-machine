@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from models import Todo
 
 app = FastAPI()
 # In-memory array (future database conection)
@@ -8,25 +9,33 @@ db = []
 def message():
     return "Hello Python!"
 # Show all items in db
-@app.get('/items/')
-def get_items():
-    return {"items": db}
+@app.get('/todos/')
+def get_todos():
+    return {"Todos": db}
+# Show only one element by id
+@app.get('/todos/{todo_id}')
+def get_todos(todo_id: int):
+    for item in db:
+        if item.id == todo_id:
+            return {"todo": item}
+        else:
+            return {"message": "Item not found"}
 # Insert a new element in db
-@app.post('/items/')
-def create_item(item: str):
-    db.append(item)
-    return {"message": "Item created", "item": item}
+@app.post('/todos/')
+def create_todo(todo: Todo):
+    db.append(todo)
+    return {"message": "Todo created!", "todo": todo}
 # Update an element in db by id
-@app.put('/items/{item_id}')
-def update_item(item_id: int, new_item: str):
-    if (0 <= item_id < len(db)):
-        db[item_id] = new_item
-        return {"message": "Item updated", "item": new_item}
+@app.put('/todos/{todo_id}')
+def update_todo(todo_id: int, new_todo: Todo):
+    if (0 <= todo_id < len(db)):
+        db[todo_id] = new_todo
+        return {"message": "Item updated", "item": new_todo}
     return {"error": "Item not found"}
 # Delete an element from db by id
-@app.delete('/items/{item_id}')
-def delete_item(item_id: int):
-    if (0 <= item_id < len(db)):
-        deleted_item = db.pop(item_id)
-        return {"message": "Item deleted", "deleted_item": deleted_item}
+@app.delete('/todos/{todo_id}')
+def delete_todo(todo_id: int):
+    if (0 <= todo_id < len(db)):
+        deleted_todo = db.pop(todo_id)
+        return {"message": "Item deleted", "deleted_item": deleted_todo}
     return {"error": "Item not found"}
